@@ -257,6 +257,80 @@ body {
   margin-bottom: 6px;
 }
 
+/* Guided-tour launcher button */
+.tour-launch {
+  background: #3a2c12 !important;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  font-weight: 600;
+}
+
+.tour-launch:hover {
+  filter: brightness(1.15);
+}
+
+/* Guided-tour narration card */
+.tour-card {
+  position: fixed;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, 92vw);
+  padding: 16px 18px 14px;
+  background: rgba(18, 24, 33, 0.96);
+  border: 1px solid rgba(217, 164, 65, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  z-index: 10;
+}
+
+.tour-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tour-title {
+  font-size: 19px;
+  color: var(--accent);
+}
+
+.tour-close {
+  font-size: 15px;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  flex: none;
+}
+
+.tour-body {
+  margin: 8px 0 14px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #d6dde6;
+}
+
+.tour-body p {
+  margin-bottom: 8px;
+}
+
+.tour-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tour-counter {
+  font-size: 13px;
+  color: #8a95a3;
+}
+
 #panel {
   position: fixed;
   top: 0;

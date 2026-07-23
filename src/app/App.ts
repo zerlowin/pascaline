@@ -12,6 +12,7 @@ import { CrossSection } from '../interaction/CrossSection';
 import { LabelLayer } from '../interaction/LabelLayer';
 import { Hud } from '../ui/Hud';
 import { Panel } from '../ui/Panel';
+import { Tour } from '../ui/Tour';
 
 /** Wires the model, scene, animation and UI into one running application. */
 export class App {
@@ -67,7 +68,27 @@ export class App {
         labelLayer.setVisible(on);
         this.store.set({ labels: on });
       },
+      startTour: (): void => tour.start(),
     };
+
+    const tour = new Tour(
+      {
+        reset: () => this.commands.reset(),
+        jumpTo: (v) => this.commands.jumpTo(v),
+        addAt: (p, a) => this.commands.addAt(p, a),
+        setSpeed: (s) => this.commands.setSpeed(s),
+        setExploded: (on) => {
+          exploded.setExploded(on);
+          this.store.set({ exploded: on });
+        },
+        setTransparent: (on) => {
+          crossSection.setTransparent(on);
+          this.store.set({ transparent: on });
+        },
+      },
+      this.scene.camera,
+      this.scene.controls,
+    );
 
     const picker = new Picker(this.scene.camera, this.scene.renderer.domElement);
     new StylusController(picker, this.scene.renderer.domElement, this.machine.holes, this.commands);
@@ -79,6 +100,7 @@ export class App {
       exploded.update(dt);
       crossSection.update(dt);
       labelLayer.update();
+      tour.update(dt);
     });
   }
 

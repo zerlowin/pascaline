@@ -5,6 +5,7 @@ export interface ViewApi {
   toggleExploded(): void;
   toggleTransparent(): void;
   toggleLabels(): void;
+  startTour(): void;
 }
 
 function button(label: string, onClick: () => void): HTMLButtonElement {
@@ -67,6 +68,8 @@ export class Hud {
     this.explodeBtn = button('Vue éclatée', () => view.toggleExploded());
     this.transpBtn = button('Transparence', () => view.toggleTransparent());
     this.labelsBtn = button('Étiquettes', () => view.toggleLabels());
+    const tourBtn = button('▶ Visite guidée', () => view.startTour());
+    tourBtn.classList.add('tour-launch');
     const resetBtn = button('Réinitialiser', () => commands.reset());
 
     const speedWrap = document.createElement('label');
@@ -82,6 +85,7 @@ export class Hud {
     speedWrap.appendChild(speed);
 
     controls.append(
+      tourBtn,
       this.pauseBtn,
       this.stepModeBtn,
       this.stepBtn,
