@@ -1,10 +1,15 @@
 import './ui/styles.css';
-import { SceneManager } from './scene/SceneManager';
+import { App } from './app/App';
 
 const stage = document.getElementById('stage');
-if (!stage) {
-  throw new Error('Élément #stage introuvable dans le document.');
+const hud = document.getElementById('hud');
+const panel = document.getElementById('panel');
+if (!stage || !hud || !panel) {
+  throw new Error('Structure HTML attendue introuvable (#stage / #hud / #panel).');
 }
 
-const app = new SceneManager(stage);
+const app = new App(stage, hud, panel);
 app.start();
+
+// Debug/automation handle (harmless global; also used by the guided tour).
+(window as unknown as { __PASCALINE__: App }).__PASCALINE__ = app;

@@ -20,6 +20,19 @@ indépendantes les unes des autres.
 - La **soustraction** se fait par **complément à neuf**, à l'aide d'une **barre
   coulissante** qui dévoile une seconde rangée de chiffres sur les tympans.
 
+## Fonctionnalités
+
+- **Saisie au stylet** : cliquez un chiffre sur une roue d'entrée pour l'ajouter
+  à sa colonne ; ou tapez un nombre entier.
+- **Report animé** : le sautoir s'arme puis retombe par gravité ; la retenue se
+  propage en cascade (essayez 999999 + 1).
+- **Ralenti & pas-à-pas** : réglez la vitesse, mettez en pause, ou avancez le
+  mécanisme étape par étape.
+- **Vue éclatée** et **transparence** pour voir l'intérieur du mécanisme.
+- **Étiquettes cliquables** + glossaire français de chaque pièce.
+- **Visite guidée** en français, avec déplacements de caméra et démonstrations.
+- **Soustraction** par complément à neuf, avec la barre coulissante.
+
 ## Développement local
 
 Prérequis : Node.js 20+.
