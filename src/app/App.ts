@@ -14,6 +14,8 @@ import { ComplementBar } from '../interaction/ComplementBar';
 import { Hud } from '../ui/Hud';
 import { Panel } from '../ui/Panel';
 import { Tour } from '../ui/Tour';
+import { Welcome } from '../ui/Welcome';
+import { fr } from '../content/fr';
 
 /** Wires the model, scene, animation and UI into one running application. */
 export class App {
@@ -76,6 +78,7 @@ export class App {
       },
       startTour: (): void => tour.start(),
       toggleMode: (): void => setMode(this.store.get().mode === 'sub' ? 'add' : 'sub'),
+      showHelp: (): void => panel.show(fr.howItWorksTitle, fr.howItWorks),
     };
 
     const tour = new Tour(
@@ -101,6 +104,7 @@ export class App {
     const picker = new Picker(this.scene.camera, this.scene.renderer.domElement);
     new StylusController(picker, this.scene.renderer.domElement, this.machine.holes, this.commands);
     new Hud(hudRoot, this.commands, this.store, view);
+    new Welcome(() => tour.start());
 
     this.scheduler.onIdle = () => this.commands.syncFromModel();
     this.scene.onFrame((dt) => {

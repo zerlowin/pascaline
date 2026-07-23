@@ -6,6 +6,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     target: 'es2020',
+    // Three.js is one ~560 kB chunk; that's expected for a 3D app.
+    chunkSizeWarningLimit: 900,
   },
   test: {
     environment: 'node',

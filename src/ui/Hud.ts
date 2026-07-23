@@ -7,6 +7,7 @@ export interface ViewApi {
   toggleLabels(): void;
   startTour(): void;
   toggleMode(): void;
+  showHelp(): void;
 }
 
 function button(label: string, onClick: () => void): HTMLButtonElement {
@@ -79,6 +80,7 @@ export class Hud {
     this.modeBtn = button('Soustraction', () => view.toggleMode());
     const tourBtn = button('▶ Visite guidée', () => view.startTour());
     tourBtn.classList.add('tour-launch');
+    const helpBtn = button('Aide', () => view.showHelp());
     const resetBtn = button('Réinitialiser', () => commands.reset());
 
     const speedWrap = document.createElement('label');
@@ -102,6 +104,7 @@ export class Hud {
       this.explodeBtn,
       this.transpBtn,
       this.labelsBtn,
+      helpBtn,
       speedWrap,
       resetBtn,
     );
