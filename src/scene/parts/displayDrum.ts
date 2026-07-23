@@ -9,25 +9,28 @@ export interface DrumOptions {
   length?: number;
 }
 
+/** Offsets (along the drum axis X) of the two numeral bands. */
+export const BAND = {
+  value: -0.34,
+  complement: 0.34,
+} as const;
+
 /**
- * The display drum (tympan): a cylinder laid along the X axis carrying the
- * numerals 0–9 as upright canvas-texture planes, one per angular slot. Reading
- * window is at the top (+Y). Rotating the drum about X scrolls digits through
- * the window.
+ * The display drum (tympan): a cylinder along X carrying TWO numeral bands —
+ * the value (digit d) and its nine's-complement (9 − d) — side by side. At the
+ * reading window both a digit and its complement appear; the sliding bar
+ * (added per station) masks whichever band is not in use.
  *
- * Digit `d` sits at the top when the drum's rotation.x = d · (2π/10). Advancing
- * the register (d → d+1) therefore increases rotation.x by one notch.
- *
- * Returns a group whose own transform is identity — the caller (rotor) owns the
- * X-rotation so the counting gear turns with it.
+ * Digit `d` sits at the reading window when rotation.x = d·NOTCH + READ_OFFSET;
+ * because the complement numeral (9−d) shares slot d, it lands at the window at
+ * the same moment.
  */
 export function createDisplayDrum(opts: DrumOptions = {}): THREE.Group {
   const radius = opts.radius ?? 0.95;
-  const length = opts.length ?? 1.3;
+  const length = opts.length ?? 1.4;
   const group = new THREE.Group();
   group.name = 'displayDrum';
 
-  // Drum body: a Y-axis cylinder rotated to lie along X.
   const body = new THREE.Mesh(
     new THREE.CylinderGeometry(radius, radius, length, 48, 1, false),
     materials.parchment,
@@ -37,7 +40,6 @@ export function createDisplayDrum(opts: DrumOptions = {}): THREE.Group {
   body.receiveShadow = true;
   group.add(body);
 
-  // Two brass end caps for a finished look.
   for (const sx of [-1, 1]) {
     const cap = new THREE.Mesh(
       new THREE.CylinderGeometry(radius * 1.02, radius * 1.02, 0.06, 48),
@@ -48,26 +50,33 @@ export function createDisplayDrum(opts: DrumOptions = {}): THREE.Group {
     group.add(cap);
   }
 
-  // Numeral planes on per-digit pivots around the X axis.
-  const planeW = Math.min(length * 0.62, 0.85);
-  const planeH = (radius * TAU) / 10 * 0.82;
+  // Thin rib between the two bands.
+  const rib = new THREE.Mesh(
+    new THREE.CylinderGeometry(radius * 1.005, radius * 1.005, 0.04, 48),
+    materials.brassDark,
+  );
+  rib.rotation.z = Math.PI / 2;
+  group.add(rib);
+
+  const planeW = 0.5;
+  const planeH = ((radius * TAU) / 10) * 0.8;
   const planeGeo = new THREE.PlaneGeometry(planeW, planeH);
+
+  const makePlane = (text: string, bandX: number): THREE.Mesh => {
+    const plane = new THREE.Mesh(
+      planeGeo,
+      new THREE.MeshStandardMaterial({ map: glyphTexture(text), roughness: 0.9, metalness: 0 }),
+    );
+    plane.position.set(bandX, radius + 0.002, 0);
+    plane.rotation.x = -Math.PI / 2;
+    return plane;
+  };
 
   for (let d = 0; d < 10; d++) {
     const pivot = new THREE.Object3D();
-    pivot.rotation.x = -d * (TAU / 10); // digit d's angular slot
-    const plane = new THREE.Mesh(
-      planeGeo,
-      new THREE.MeshStandardMaterial({
-        map: glyphTexture(String(d)),
-        roughness: 0.9,
-        metalness: 0,
-      }),
-    );
-    // Sit on the rim, normal pointing radially outward, numeral upright:
-    plane.position.set(0, radius + 0.002, 0);
-    plane.rotation.x = -Math.PI / 2;
-    pivot.add(plane);
+    pivot.rotation.x = -d * (TAU / 10);
+    pivot.add(makePlane(String(d), BAND.value)); // value band
+    pivot.add(makePlane(String(9 - d), BAND.complement)); // complement band
     group.add(pivot);
   }
 

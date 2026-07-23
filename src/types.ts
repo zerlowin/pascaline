@@ -37,6 +37,8 @@ export interface StationRefs {
   pinion: THREE.Object3D;
   /** The ratchet pawl resting on the counting wheel. */
   pawl: THREE.Object3D;
-  /** The numeral drum group (two rows + sliding bar added in Phase 8). */
+  /** The numeral drum group (value + complement bands). */
   drum: THREE.Group;
+  /** The sliding bar segment masking one band of this drum. */
+  cover: THREE.Object3D;
 }

@@ -331,6 +331,24 @@ body {
   color: #8a95a3;
 }
 
+.readout-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.mode-tag {
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: #8a95a3;
+  text-transform: uppercase;
+}
+
+.mode-tag.sub {
+  color: var(--accent);
+}
+
 #panel {
   position: fixed;
   top: 0;

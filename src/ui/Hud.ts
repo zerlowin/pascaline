@@ -6,6 +6,7 @@ export interface ViewApi {
   toggleTransparent(): void;
   toggleLabels(): void;
   startTour(): void;
+  toggleMode(): void;
 }
 
 function button(label: string, onClick: () => void): HTMLButtonElement {
@@ -26,6 +27,8 @@ export class Hud {
   private readonly explodeBtn: HTMLButtonElement;
   private readonly transpBtn: HTMLButtonElement;
   private readonly labelsBtn: HTMLButtonElement;
+  private readonly modeBtn: HTMLButtonElement;
+  private readonly modeTag: HTMLElement;
 
   constructor(root: HTMLElement, commands: Commands, store: Store, view: ViewApi) {
     root.innerHTML = '';
@@ -33,11 +36,16 @@ export class Hud {
     const bar = document.createElement('div');
     bar.className = 'hud-bar';
 
-    // --- Readout ---
+    // --- Readout (with a small mode tag) ---
+    const readoutWrap = document.createElement('div');
+    readoutWrap.className = 'readout-wrap';
+    this.modeTag = document.createElement('div');
+    this.modeTag.className = 'mode-tag';
     this.readout = document.createElement('div');
     this.readout.className = 'readout';
     this.readout.setAttribute('role', 'status');
     this.readout.setAttribute('aria-label', 'Valeur affichée');
+    readoutWrap.append(this.modeTag, this.readout);
 
     // --- Number entry (compose / demo an arbitrary number) ---
     const entry = document.createElement('form');
@@ -68,6 +76,7 @@ export class Hud {
     this.explodeBtn = button('Vue éclatée', () => view.toggleExploded());
     this.transpBtn = button('Transparence', () => view.toggleTransparent());
     this.labelsBtn = button('Étiquettes', () => view.toggleLabels());
+    this.modeBtn = button('Soustraction', () => view.toggleMode());
     const tourBtn = button('▶ Visite guidée', () => view.startTour());
     tourBtn.classList.add('tour-launch');
     const resetBtn = button('Réinitialiser', () => commands.reset());
@@ -86,6 +95,7 @@ export class Hud {
 
     controls.append(
       tourBtn,
+      this.modeBtn,
       this.pauseBtn,
       this.stepModeBtn,
       this.stepBtn,
@@ -95,7 +105,7 @@ export class Hud {
       speedWrap,
       resetBtn,
     );
-    bar.append(this.readout, entry, controls);
+    bar.append(readoutWrap, entry, controls);
 
     const hint = document.createElement('p');
     hint.className = 'hud-hint';
@@ -108,15 +118,21 @@ export class Hud {
   }
 
   private update(s: State): void {
-    // Big-endian readout (highest digit on the left).
+    // Big-endian readout; in subtraction the visible row is the nine's complement.
+    const sub = s.mode === 'sub';
     this.readout.textContent = '';
-    const digits = s.register.slice().reverse();
+    const digits = s.register.map((d) => (sub ? 9 - d : d)).reverse();
     digits.forEach((d) => {
       const cell = document.createElement('span');
       cell.className = 'digit';
       cell.textContent = String(d);
       this.readout.appendChild(cell);
     });
+
+    this.modeTag.textContent = sub ? 'Soustraction · lecture du complément à 9' : 'Addition';
+    this.modeTag.classList.toggle('sub', sub);
+    this.modeBtn.textContent = sub ? 'Addition' : 'Soustraction';
+    this.modeBtn.classList.toggle('active', sub);
 
     this.pauseBtn.textContent = s.paused ? 'Lecture ▶' : 'Pause';
     this.pauseBtn.classList.toggle('active', s.paused);

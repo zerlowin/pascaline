@@ -4,6 +4,7 @@ export interface TourApi {
   jumpTo(value: number): void;
   addAt(pos: number, amount: number): void;
   setSpeed(v: number): void;
+  setMode(mode: 'add' | 'sub'): void;
   setExploded(on: boolean): void;
   setTransparent(on: boolean): void;
 }
@@ -69,20 +70,36 @@ export const tourSteps: TourStep[] = [
     },
   },
   {
+    title: 'La soustraction',
+    body: "<p>La machine n'additionne jamais que. Pour soustraire, on lit la seconde rangée des tympans — le <em>complément à neuf</em> — grâce à la barre coulissante.</p><p>Démonstration de 500 − 123 : la fenêtre affiche d'abord 500, puis on additionne 123… et le complément descend jusqu'à <strong>377</strong>.</p>",
+    cam: { pos: [0, 4, 10], target: [0, 1.7, 0] },
+    run: (api) => {
+      api.reset();
+      api.setMode('sub');
+      api.jumpTo(999999 - 500); // complement window shows 500
+      api.setSpeed(0.6);
+      api.addAt(0, 3);
+      api.addAt(1, 2);
+      api.addAt(2, 1); // + 123
+    },
+  },
+  {
     title: "Voir l'intérieur",
     body: "<p>Utilisez « Vue éclatée » pour séparer les pièces, ou « Transparence » pour voir le mécanisme à travers le carter. « Étiquettes » nomme chaque pièce.</p>",
     cam: { pos: [-3, 4, 9], target: [0, 1.4, 0] },
     run: (api) => {
+      api.setMode('add');
       api.setSpeed(1);
       api.setTransparent(true);
     },
   },
   {
     title: 'À vous de jouer',
-    body: "<p>La visite est terminée. Composez un nombre au clavier ou au stylet, essayez une retenue, ralentissez le mouvement… et explorez la soustraction par complément à neuf.</p>",
+    body: "<p>La visite est terminée. Composez un nombre au clavier ou au stylet, essayez une retenue, ralentissez le mouvement, ou passez en soustraction avec le bouton « Soustraction ».</p>",
     cam: { pos: [0, 5, 14], target: [0, 1.4, 0] },
     run: (api) => {
       api.setTransparent(false);
+      api.setMode('add');
       api.reset();
     },
   },

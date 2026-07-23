@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { createInputWheel } from './parts/inputWheel';
 import { createCountingWheel } from './parts/countingWheel';
-import { createDisplayDrum } from './parts/displayDrum';
+import { createDisplayDrum, BAND } from './parts/displayDrum';
 import { createLanternPinion } from './parts/lanternPinion';
 import { materials } from './materials';
-import { STATION } from './layout';
+import { READ_OFFSET, STATION } from './layout';
 import type { PartUserData, StationRefs } from '../types';
 
 export interface StationBuild {
@@ -59,6 +59,18 @@ export function createDigitStation(index: number): StationBuild {
   pawl.userData = { partId: 'pawl', stationIndex: index } satisfies PartUserData;
   group.add(pawl);
 
+  // Sliding bar segment: masks one numeral band at the reading window. Rests in
+  // the "addition" position (masking the complement band); ComplementBar slides
+  // it to reveal the complement for subtraction.
+  const coverY = Math.cos(READ_OFFSET) + 0.05;
+  const coverZ = Math.sin(READ_OFFSET) + 0.05;
+  const cover = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.7, 0.06), materials.brass);
+  cover.position.set(STATION.drumOffsetX + BAND.complement, coverY, coverZ);
+  cover.rotation.x = READ_OFFSET - Math.PI / 2;
+  cover.castShadow = true;
+  cover.userData = { partId: 'complementBar', stationIndex: index } satisfies PartUserData;
+  group.add(cover);
+
   // Input wheel at the front.
   const input = createInputWheel({ stationIndex: index });
   input.group.position.set(0, STATION.inputY, STATION.inputZ);
@@ -73,6 +85,7 @@ export function createDigitStation(index: number): StationBuild {
     pinion,
     pawl,
     drum,
+    cover,
   };
   return { refs, holes: input.holes };
 }

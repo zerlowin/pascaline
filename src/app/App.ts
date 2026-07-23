@@ -10,6 +10,7 @@ import { StylusController } from '../interaction/StylusController';
 import { ExplodedView } from '../interaction/ExplodedView';
 import { CrossSection } from '../interaction/CrossSection';
 import { LabelLayer } from '../interaction/LabelLayer';
+import { ComplementBar } from '../interaction/ComplementBar';
 import { Hud } from '../ui/Hud';
 import { Panel } from '../ui/Panel';
 import { Tour } from '../ui/Tour';
@@ -52,6 +53,11 @@ export class App {
     const exploded = new ExplodedView(this.machine);
     const crossSection = new CrossSection(this.machine);
     const labelLayer = new LabelLayer(this.scene.scene, this.machine, panel);
+    const complementBar = new ComplementBar(this.machine);
+    const setMode = (mode: 'add' | 'sub'): void => {
+      complementBar.setMode(mode);
+      this.store.set({ mode });
+    };
     const view = {
       toggleExploded: (): void => {
         const on = !this.store.get().exploded;
@@ -69,6 +75,7 @@ export class App {
         this.store.set({ labels: on });
       },
       startTour: (): void => tour.start(),
+      toggleMode: (): void => setMode(this.store.get().mode === 'sub' ? 'add' : 'sub'),
     };
 
     const tour = new Tour(
@@ -77,6 +84,7 @@ export class App {
         jumpTo: (v) => this.commands.jumpTo(v),
         addAt: (p, a) => this.commands.addAt(p, a),
         setSpeed: (s) => this.commands.setSpeed(s),
+        setMode,
         setExploded: (on) => {
           exploded.setExploded(on);
           this.store.set({ exploded: on });
@@ -99,6 +107,7 @@ export class App {
       this.scheduler.tick(dt);
       exploded.update(dt);
       crossSection.update(dt);
+      complementBar.update(dt);
       labelLayer.update();
       tour.update(dt);
     });
