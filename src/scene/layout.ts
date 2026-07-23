@@ -4,6 +4,13 @@ export const TAU = Math.PI * 2;
 /** One digit step of a wheel, in radians (36°). */
 export const NOTCH = TAU / 10;
 
+/**
+ * Angular offset (radians) applied to a drum's rest position so the *register*
+ * digit sits on the front-upper face — the one the default camera reads through
+ * the window — instead of straight up top.
+ */
+export const READ_OFFSET = 0.52;
+
 /** Horizontal spacing between adjacent digit stations. */
 export const STATION_PITCH = 2.4;
 

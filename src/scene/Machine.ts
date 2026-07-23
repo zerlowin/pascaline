@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { createDigitStation } from './DigitStation';
 import { createSautoir } from './parts/sautoir';
-import { MACHINE_Y, NOTCH, STATION_PITCH, stationX } from './layout';
+import { createChassis } from './parts/chassis';
+import { MACHINE_Y, NOTCH, READ_OFFSET, STATION_PITCH, stationX } from './layout';
 import type { StationRefs } from '../types';
 
 /**
@@ -14,11 +15,15 @@ export class Machine {
   readonly stations: StationRefs[] = [];
   readonly sautoirs: THREE.Group[] = [];
   readonly holes: THREE.Mesh[] = [];
+  readonly chassis: THREE.Group;
   readonly count: number;
 
   constructor(count: number) {
     this.count = count;
     this.group.name = 'machine';
+
+    this.chassis = createChassis(count, STATION_PITCH);
+    this.group.add(this.chassis);
 
     for (let i = 0; i < count; i++) {
       const built = createDigitStation(i);
@@ -40,7 +45,7 @@ export class Machine {
 
   /** Instantly snap a station's rotor to show digit `d` (no animation). */
   setDigit(index: number, d: number): void {
-    this.stations[index].rotor.rotation.x = d * NOTCH;
+    this.stations[index].rotor.rotation.x = d * NOTCH + READ_OFFSET;
   }
 
   /** Snap all rotors to the given register (index 0 = units). */

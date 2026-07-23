@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { createInputWheel } from './parts/inputWheel';
 import { createCountingWheel } from './parts/countingWheel';
 import { createDisplayDrum } from './parts/displayDrum';
+import { createLanternPinion } from './parts/lanternPinion';
+import { materials } from './materials';
 import { STATION } from './layout';
 import type { PartUserData, StationRefs } from '../types';
 
@@ -36,8 +38,26 @@ export function createDigitStation(index: number): StationBuild {
     }
   });
 
-  rotor.add(gear, drum);
+  // Lantern pinion on the same shaft, outboard of the gear.
+  const pinion = createLanternPinion();
+  pinion.position.x = STATION.gearOffsetX + 0.5;
+  pinion.traverse((o) => {
+    if ((o as THREE.Mesh).isMesh) {
+      o.userData = { partId: 'lanternPinion', stationIndex: index } satisfies PartUserData;
+    }
+  });
+
+  rotor.add(gear, drum, pinion);
   group.add(rotor);
+
+  // Ratchet pawl: a small sprung detent resting on the counting wheel's teeth
+  // (anti-return). Static — it just holds the wheel between notches.
+  const pawl = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.12, 0.14), materials.steelDark);
+  pawl.position.set(STATION.gearOffsetX, 0.92, 0.28);
+  pawl.rotation.z = -0.35;
+  pawl.castShadow = true;
+  pawl.userData = { partId: 'pawl', stationIndex: index } satisfies PartUserData;
+  group.add(pawl);
 
   // Input wheel at the front.
   const input = createInputWheel({ stationIndex: index });
