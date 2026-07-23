@@ -1,6 +1,11 @@
 import type { Commands } from '../app/commands';
 import type { State, Store } from '../app/store';
 
+export interface ViewApi {
+  toggleExploded(): void;
+  toggleTransparent(): void;
+}
+
 function button(label: string, onClick: () => void): HTMLButtonElement {
   const b = document.createElement('button');
   b.type = 'button';
@@ -16,8 +21,10 @@ export class Hud {
   private readonly pauseBtn: HTMLButtonElement;
   private readonly stepBtn: HTMLButtonElement;
   private readonly stepModeBtn: HTMLButtonElement;
+  private readonly explodeBtn: HTMLButtonElement;
+  private readonly transpBtn: HTMLButtonElement;
 
-  constructor(root: HTMLElement, commands: Commands, store: Store) {
+  constructor(root: HTMLElement, commands: Commands, store: Store, view: ViewApi) {
     root.innerHTML = '';
 
     const bar = document.createElement('div');
@@ -55,6 +62,8 @@ export class Hud {
     this.pauseBtn = button('Pause', () => commands.setPaused(!store.get().paused));
     this.stepModeBtn = button('Pas à pas', () => commands.setStepMode(!store.get().stepMode));
     this.stepBtn = button('Pas suivant ▸', () => commands.step());
+    this.explodeBtn = button('Vue éclatée', () => view.toggleExploded());
+    this.transpBtn = button('Transparence', () => view.toggleTransparent());
     const resetBtn = button('Réinitialiser', () => commands.reset());
 
     const speedWrap = document.createElement('label');
@@ -69,7 +78,15 @@ export class Hud {
     speed.addEventListener('input', () => commands.setSpeed(parseFloat(speed.value)));
     speedWrap.appendChild(speed);
 
-    controls.append(this.pauseBtn, this.stepModeBtn, this.stepBtn, speedWrap, resetBtn);
+    controls.append(
+      this.pauseBtn,
+      this.stepModeBtn,
+      this.stepBtn,
+      this.explodeBtn,
+      this.transpBtn,
+      speedWrap,
+      resetBtn,
+    );
     bar.append(this.readout, entry, controls);
 
     const hint = document.createElement('p');
@@ -97,6 +114,8 @@ export class Hud {
     this.pauseBtn.classList.toggle('active', s.paused);
     this.stepModeBtn.classList.toggle('active', s.stepMode);
     this.stepBtn.disabled = !s.stepMode;
+    this.explodeBtn.classList.toggle('active', s.exploded);
+    this.transpBtn.classList.toggle('active', s.transparent);
 
     if (s.overflow) {
       this.readout.classList.remove('flash');

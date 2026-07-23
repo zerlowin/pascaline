@@ -11,6 +11,8 @@ export interface State {
   mode: 'add' | 'sub';
   /** True for one update after a carry ran off the top wheel. */
   overflow: boolean;
+  exploded: boolean;
+  transparent: boolean;
 }
 
 type Listener = (s: State) => void;

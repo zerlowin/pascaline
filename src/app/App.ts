@@ -7,6 +7,8 @@ import { Store } from './store';
 import { Commands } from './commands';
 import { Picker } from '../interaction/Picker';
 import { StylusController } from '../interaction/StylusController';
+import { ExplodedView } from '../interaction/ExplodedView';
+import { CrossSection } from '../interaction/CrossSection';
 import { Hud } from '../ui/Hud';
 
 /** Wires the model, scene, animation and UI into one running application. */
@@ -36,16 +38,37 @@ export class App {
       stepMode: false,
       mode: 'add',
       overflow: false,
+      exploded: false,
+      transparent: false,
     });
 
     this.commands = new Commands(model, this.machine, animator, this.scheduler, this.store);
 
+    const exploded = new ExplodedView(this.machine);
+    const crossSection = new CrossSection(this.machine);
+    const view = {
+      toggleExploded: (): void => {
+        const on = !this.store.get().exploded;
+        exploded.setExploded(on);
+        this.store.set({ exploded: on });
+      },
+      toggleTransparent: (): void => {
+        const on = !this.store.get().transparent;
+        crossSection.setTransparent(on);
+        this.store.set({ transparent: on });
+      },
+    };
+
     const picker = new Picker(this.scene.camera, this.scene.renderer.domElement);
     new StylusController(picker, this.scene.renderer.domElement, this.machine.holes, this.commands);
-    new Hud(hudRoot, this.commands, this.store);
+    new Hud(hudRoot, this.commands, this.store, view);
 
     this.scheduler.onIdle = () => this.commands.syncFromModel();
-    this.scene.onFrame((dt) => this.scheduler.tick(dt));
+    this.scene.onFrame((dt) => {
+      this.scheduler.tick(dt);
+      exploded.update(dt);
+      crossSection.update(dt);
+    });
   }
 
   /** Current UI state snapshot (used by tests/automation). */
