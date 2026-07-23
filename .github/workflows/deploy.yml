@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["claude/pascaline-3d-model-iu0j7s"]
+    branches: ["main", "claude/pascaline-3d-model-iu0j7s"]
   workflow_dispatch:
 
 # Permissions required by the Pages deployment
