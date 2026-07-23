@@ -1,0 +1,86 @@
+:root {
+  color-scheme: dark;
+  --bg: #0f141c;
+  --ink: #e8eef6;
+  --accent: #d9a441;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* 3D stage: WebGL canvas + CSS2D label overlay stacked in the same box */
+#stage {
+  position: fixed;
+  inset: 0;
+}
+
+#stage canvas.webgl {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* The label overlay must not eat pointer events — only individual labels do */
+#stage .labels {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+#stage .labels > * {
+  pointer-events: auto;
+}
+
+/* Placeholder scaffolding label (Phase 0) */
+.scaffold-label {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(15, 20, 28, 0.75);
+  color: var(--accent);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  border: 1px solid rgba(217, 164, 65, 0.35);
+}
+
+/* HUD + panel are wired up in later phases */
+#hud {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 12px;
+}
+
+#panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 340px;
+  max-width: 90vw;
+  height: 100%;
+  padding: 20px;
+  overflow-y: auto;
+  background: rgba(20, 26, 36, 0.96);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
