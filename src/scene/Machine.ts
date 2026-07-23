@@ -1,15 +1,18 @@
 import * as THREE from 'three';
 import { createDigitStation } from './DigitStation';
-import { MACHINE_Y, NOTCH, stationX } from './layout';
+import { createSautoir } from './parts/sautoir';
+import { MACHINE_Y, NOTCH, STATION_PITCH, stationX } from './layout';
 import type { StationRefs } from '../types';
 
 /**
- * The assembled Pascaline: a row of `count` digit stations sharing one factory.
- * Holds only view objects; the model + animator drive it from outside.
+ * The assembled Pascaline: a row of `count` digit stations sharing one factory,
+ * with a sautoir bridging each adjacent pair (count − 1 of them). Holds only
+ * view objects; the model + animator drive it from outside.
  */
 export class Machine {
   readonly group = new THREE.Group();
   readonly stations: StationRefs[] = [];
+  readonly sautoirs: THREE.Group[] = [];
   readonly holes: THREE.Mesh[] = [];
   readonly count: number;
 
@@ -23,6 +26,15 @@ export class Machine {
       this.group.add(built.refs.group);
       this.stations.push(built.refs);
       this.holes.push(...built.holes);
+    }
+
+    // Sautoir i carries from wheel i to wheel i+1, sitting in the gap between.
+    for (let i = 0; i < count - 1; i++) {
+      const sautoir = createSautoir(i);
+      const xMid = stationX(i, count) - STATION_PITCH / 2;
+      sautoir.position.set(xMid, MACHINE_Y + 0.95, 0.15);
+      this.group.add(sautoir);
+      this.sautoirs.push(sautoir);
     }
   }
 

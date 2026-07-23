@@ -11,7 +11,7 @@ import { Hud } from '../ui/Hud';
 
 /** Wires the model, scene, animation and UI into one running application. */
 export class App {
-  private readonly scene: SceneManager;
+  readonly scene: SceneManager;
   private readonly machine: Machine;
   private readonly scheduler: Scheduler;
   /** Public so the guided tour (and tests) can drive operations. */
@@ -26,7 +26,7 @@ export class App {
 
     const model = new PascalineModel(WHEEL_COUNT);
     this.scheduler = new Scheduler();
-    const animator = new Animator(this.machine.stations);
+    const animator = new Animator(this.machine.stations, this.machine.sautoirs);
     this.store = new Store({
       register: new Array<number>(WHEEL_COUNT).fill(0),
       value: 0,
