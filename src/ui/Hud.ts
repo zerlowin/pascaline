@@ -4,6 +4,7 @@ import type { State, Store } from '../app/store';
 export interface ViewApi {
   toggleExploded(): void;
   toggleTransparent(): void;
+  toggleLabels(): void;
 }
 
 function button(label: string, onClick: () => void): HTMLButtonElement {
@@ -23,6 +24,7 @@ export class Hud {
   private readonly stepModeBtn: HTMLButtonElement;
   private readonly explodeBtn: HTMLButtonElement;
   private readonly transpBtn: HTMLButtonElement;
+  private readonly labelsBtn: HTMLButtonElement;
 
   constructor(root: HTMLElement, commands: Commands, store: Store, view: ViewApi) {
     root.innerHTML = '';
@@ -64,6 +66,7 @@ export class Hud {
     this.stepBtn = button('Pas suivant ▸', () => commands.step());
     this.explodeBtn = button('Vue éclatée', () => view.toggleExploded());
     this.transpBtn = button('Transparence', () => view.toggleTransparent());
+    this.labelsBtn = button('Étiquettes', () => view.toggleLabels());
     const resetBtn = button('Réinitialiser', () => commands.reset());
 
     const speedWrap = document.createElement('label');
@@ -84,6 +87,7 @@ export class Hud {
       this.stepBtn,
       this.explodeBtn,
       this.transpBtn,
+      this.labelsBtn,
       speedWrap,
       resetBtn,
     );
@@ -116,6 +120,7 @@ export class Hud {
     this.stepBtn.disabled = !s.stepMode;
     this.explodeBtn.classList.toggle('active', s.exploded);
     this.transpBtn.classList.toggle('active', s.transparent);
+    this.labelsBtn.classList.toggle('active', s.labels);
 
     if (s.overflow) {
       this.readout.classList.remove('flash');

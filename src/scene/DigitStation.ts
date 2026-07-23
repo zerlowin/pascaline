@@ -70,6 +70,8 @@ export function createDigitStation(index: number): StationBuild {
     inputWheel: input.group,
     rotor,
     gear,
+    pinion,
+    pawl,
     drum,
   };
   return { refs, holes: input.holes };

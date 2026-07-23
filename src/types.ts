@@ -33,6 +33,10 @@ export interface StationRefs {
   rotor: THREE.Group;
   /** The toothed counting wheel mesh (carry pins added in Phase 2). */
   gear: THREE.Object3D;
+  /** The lantern pinion on the same shaft. */
+  pinion: THREE.Object3D;
+  /** The ratchet pawl resting on the counting wheel. */
+  pawl: THREE.Object3D;
   /** The numeral drum group (two rows + sliding bar added in Phase 8). */
   drum: THREE.Group;
 }

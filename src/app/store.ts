@@ -13,6 +13,7 @@ export interface State {
   overflow: boolean;
   exploded: boolean;
   transparent: boolean;
+  labels: boolean;
 }
 
 type Listener = (s: State) => void;

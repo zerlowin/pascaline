@@ -9,7 +9,9 @@ import { Picker } from '../interaction/Picker';
 import { StylusController } from '../interaction/StylusController';
 import { ExplodedView } from '../interaction/ExplodedView';
 import { CrossSection } from '../interaction/CrossSection';
+import { LabelLayer } from '../interaction/LabelLayer';
 import { Hud } from '../ui/Hud';
+import { Panel } from '../ui/Panel';
 
 /** Wires the model, scene, animation and UI into one running application. */
 export class App {
@@ -20,7 +22,7 @@ export class App {
   readonly commands: Commands;
   private readonly store: Store;
 
-  constructor(stage: HTMLElement, hudRoot: HTMLElement) {
+  constructor(stage: HTMLElement, hudRoot: HTMLElement, panelRoot: HTMLElement) {
     this.scene = new SceneManager(stage);
 
     this.machine = new Machine(WHEEL_COUNT);
@@ -40,12 +42,15 @@ export class App {
       overflow: false,
       exploded: false,
       transparent: false,
+      labels: false,
     });
 
     this.commands = new Commands(model, this.machine, animator, this.scheduler, this.store);
 
+    const panel = new Panel(panelRoot);
     const exploded = new ExplodedView(this.machine);
     const crossSection = new CrossSection(this.machine);
+    const labelLayer = new LabelLayer(this.scene.scene, this.machine, panel);
     const view = {
       toggleExploded: (): void => {
         const on = !this.store.get().exploded;
@@ -56,6 +61,11 @@ export class App {
         const on = !this.store.get().transparent;
         crossSection.setTransparent(on);
         this.store.set({ transparent: on });
+      },
+      toggleLabels: (): void => {
+        const on = !this.store.get().labels;
+        labelLayer.setVisible(on);
+        this.store.set({ labels: on });
       },
     };
 
@@ -68,6 +78,7 @@ export class App {
       this.scheduler.tick(dt);
       exploded.update(dt);
       crossSection.update(dt);
+      labelLayer.update();
     });
   }
 
