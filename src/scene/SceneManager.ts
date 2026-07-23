@@ -37,13 +37,13 @@ export class SceneManager {
 
     this.scene.background = new THREE.Color(0x141b26);
 
-    this.camera = new THREE.PerspectiveCamera(42, 1, 0.1, 500);
-    this.camera.position.set(0.5, 7.5, 17);
+    this.camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500);
+    this.camera.position.set(0, 5, 14);
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.08;
-    this.controls.target.set(0, 1.1, 0);
+    this.controls.target.set(0, 1.4, 0);
     this.controls.maxDistance = 70;
     this.controls.minDistance = 3;
 

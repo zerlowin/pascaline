@@ -9,6 +9,8 @@ export interface State {
   paused: boolean;
   stepMode: boolean;
   mode: 'add' | 'sub';
+  /** True for one update after a carry ran off the top wheel. */
+  overflow: boolean;
 }
 
 type Listener = (s: State) => void;

@@ -35,6 +35,7 @@ export class App {
       paused: false,
       stepMode: false,
       mode: 'add',
+      overflow: false,
     });
 
     this.commands = new Commands(model, this.machine, animator, this.scheduler, this.store);

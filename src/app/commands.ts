@@ -3,13 +3,17 @@ import type { Machine } from '../scene/Machine';
 import type { Animator } from '../anim/Animator';
 import type { Scheduler } from '../anim/scheduler';
 import type { Store } from './store';
+import { isOverflow } from '../model/steps';
 
 /**
  * The only writer that touches the model. UI and interaction go through here;
  * every mutation flows model → animator → scheduler, then the store mirrors the
- * model when the animation settles.
+ * model when the animation settles. Operations queue on the scheduler, so
+ * several clicks (or a whole number) chain naturally.
  */
 export class Commands {
+  private pendingOverflow = false;
+
   constructor(
     private readonly model: PascalineModel,
     private readonly machine: Machine,
@@ -21,16 +25,35 @@ export class Commands {
   /** Add `amount` (0–9) to the wheel at `pos` by dialing it. */
   addAt(pos: number, amount: number): void {
     if (amount <= 0) return;
-    if (this.scheduler.busy) return; // one operation at a time (Phase 1)
     const steps = this.model.rotate(pos, amount);
-    const tasks = this.animator.build(steps);
+    if (steps.some(isOverflow)) this.pendingOverflow = true;
     this.store.set({ busy: true });
-    this.scheduler.enqueue(...tasks);
+    this.scheduler.enqueue(...this.animator.build(steps));
+  }
+
+  /** Add a whole number, dialed column by column (units first), like the machine. */
+  addValue(value: number): void {
+    let x = Math.max(0, Math.trunc(value));
+    if (x === 0) return;
+    for (let i = 0; i < this.model.count && x > 0; i++) {
+      const d = x % 10;
+      x = Math.floor(x / 10);
+      if (d > 0) this.addAt(i, d);
+    }
   }
 
   reset(): void {
-    if (this.scheduler.busy) return;
+    this.scheduler.clear();
     this.model.reset();
+    this.pendingOverflow = false;
+    this.syncFromModel();
+  }
+
+  /** Instantly set the register (no animation) — for demos, the tour, and tests. */
+  jumpTo(value: number): void {
+    this.scheduler.clear();
+    this.model.setValue(value);
+    this.pendingOverflow = false;
     this.syncFromModel();
   }
 
@@ -60,10 +83,13 @@ export class Commands {
    */
   syncFromModel(): void {
     this.machine.setRegister(this.model.read());
+    const overflowed = this.pendingOverflow;
+    this.pendingOverflow = false;
     this.store.set({
       register: this.model.read(),
       value: this.model.value(),
       busy: this.scheduler.busy,
+      overflow: overflowed,
     });
   }
 }

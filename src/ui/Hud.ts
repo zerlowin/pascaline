@@ -29,6 +29,25 @@ export class Hud {
     this.readout.setAttribute('role', 'status');
     this.readout.setAttribute('aria-label', 'Valeur affichée');
 
+    // --- Number entry (compose / demo an arbitrary number) ---
+    const entry = document.createElement('form');
+    entry.className = 'hud-entry';
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = '0';
+    input.max = '999999';
+    input.placeholder = 'nombre';
+    input.setAttribute('aria-label', 'Nombre à additionner');
+    const addBtn = button('Additionner', () => {});
+    addBtn.type = 'submit';
+    entry.append(input, addBtn);
+    entry.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = parseInt(input.value, 10);
+      if (Number.isFinite(v) && v > 0) commands.addValue(v);
+      input.value = '';
+    });
+
     // --- Controls ---
     const controls = document.createElement('div');
     controls.className = 'hud-controls';
@@ -51,7 +70,7 @@ export class Hud {
     speedWrap.appendChild(speed);
 
     controls.append(this.pauseBtn, this.stepModeBtn, this.stepBtn, speedWrap, resetBtn);
-    bar.append(this.readout, controls);
+    bar.append(this.readout, entry, controls);
 
     const hint = document.createElement('p');
     hint.className = 'hud-hint';
@@ -78,5 +97,12 @@ export class Hud {
     this.pauseBtn.classList.toggle('active', s.paused);
     this.stepModeBtn.classList.toggle('active', s.stepMode);
     this.stepBtn.disabled = !s.stepMode;
+
+    if (s.overflow) {
+      this.readout.classList.remove('flash');
+      // reflow to restart the CSS animation, then flag it
+      void this.readout.offsetWidth;
+      this.readout.classList.add('flash');
+    }
   }
 }
