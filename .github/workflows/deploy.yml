@@ -35,14 +35,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Configure Pages
-        # enablement:true asks the workflow to create/enable the Pages site
-        # automatically (token has pages:write). If your org disallows this,
-        # enable it once manually: Settings → Pages → Source: GitHub Actions.
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
